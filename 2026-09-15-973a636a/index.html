@@ -1,0 +1,509 @@
+<!doctype html>
+<html dir="rtl" lang="he">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="referrer" content="no-referrer">
+<title>אני מחפש מידע על הצורה והתבנית של השירה המקראית, אם אפשר למצוא מה כתוב…</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;600;700&family=Heebo:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0c1526;--ink2:#16213a;--gold:#c9a24a;--gold-hi:#f2d588;
+      --gold-deep:#8f6e1c;--line:#24314e;--dim:#93a0bd;--paper:#fffdf6}
+*{box-sizing:border-box;min-width:0}
+html,body{height:100%}
+body{margin:0;background:var(--ink);color:#e8e2d2;overflow:hidden;
+     font-family:"Heebo","Segoe UI",system-ui,sans-serif;display:flex;flex-direction:column}
+#bar{display:flex;align-items:center;gap:10px;padding:7px 13px;flex:none;
+     border-bottom:1px solid var(--line);font-size:12.5px;color:var(--dim)}
+#bar h1{margin:0;font-family:"Frank Ruhl Libre",David,serif;font-weight:700;font-size:16px;
+        color:var(--gold-hi);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
+#bar .n{flex:none;white-space:nowrap}
+#back{display:none;border:1px solid #3a4a6e;background:var(--ink2);color:#cfc7ae;
+      border-radius:8px;padding:3px 9px;font:inherit;font-size:12.5px;cursor:pointer}
+#app{flex:1;display:flex;min-height:0}
+/* ---- right: the conversation ---- */
+#chat{flex:0 0 46%;max-width:720px;min-width:300px;overflow-y:auto;padding:12px 14px;
+      border-inline-end:1px solid var(--line);scroll-behavior:smooth}
+.msg{margin:0 0 10px;padding:9px 13px;border-radius:12px;overflow-wrap:break-word}
+.msg.me{background:#24345c;color:#f0ead6;margin-inline-start:24px;white-space:pre-wrap;font-size:14px}
+.msg.ai{background:var(--ink2);color:#e8e2d2;font-family:"Frank Ruhl Libre",David,serif;
+        font-size:16px;line-height:1.6}
+.msg.ai p{margin:0 0 8px} .msg.ai li{list-style:disc;margin:2px 18px 2px 0}
+.msg.ai b{color:var(--gold-hi)}
+.msg.ai blockquote{margin:6px 0;padding:4px 10px;border-inline-start:3px solid var(--gold);color:#f2e8c8}
+.msg.ai code{font-size:13px;color:var(--gold-hi)}
+.msg.ai b.h{display:block;margin:8px 0 4px;color:var(--gold-hi)}
+.msg.ai table{border-collapse:collapse;margin:8px 0;font-size:13.5px;width:100%;display:block;overflow-x:auto}
+.msg.ai td,.msg.ai th{border:1px solid var(--line);padding:4px 8px;text-align:start;vertical-align:top}
+.msg.ai th{color:var(--gold-hi);background:#0f1a2e}
+a{color:#8fb8ff}
+a.cite{color:var(--gold-hi);text-decoration:none;border-bottom:1px dotted var(--gold);cursor:pointer}
+a.cite:hover{color:#fff;border-color:var(--gold-hi)}
+#srcall{margin:18px 0 30px;font-size:12.5px;color:var(--dim)}
+#srcall summary{cursor:pointer;color:var(--gold)}
+#srcall .s{padding:3px 2px;cursor:pointer;border-bottom:1px solid #1b2540}
+#srcall .s:hover{color:var(--gold-hi)}
+#srcall .s i{color:var(--dim);font-style:normal}
+/* ---- left: the viewer ---- */
+#viewer{flex:1;display:flex;flex-direction:column;background:#1a2438;min-width:0}
+#tabbar{display:flex;background:#0a111f;border-bottom:1px solid var(--line);padding:3px 6px 0;
+        gap:2px;align-items:flex-end;overflow-x:auto;scrollbar-width:none;flex:none;min-height:30px}
+.tab{display:flex;align-items:center;gap:6px;background:var(--ink2);border:1px solid var(--line);
+     border-bottom:none;border-radius:8px 8px 0 0;padding:5px 10px;font-size:12.5px;
+     color:#b8c0d8;cursor:pointer;white-space:nowrap;max-width:210px}
+.tab .tt{overflow:hidden;text-overflow:ellipsis}
+.tab.on{background:#1a2438;color:var(--gold-hi);border-color:#3a4a6e}
+.tab .x{opacity:.6;flex:none}
+.tab .x:hover{opacity:1;color:#f88}
+#panes{flex:1;position:relative;min-height:0;overflow:hidden}
+.pane{position:absolute;inset:0;display:none;overflow-y:auto;padding:14px 16px 30px}
+.pane.on{display:block}
+.pane h3{margin:0 0 2px;font-size:17px;color:var(--gold-hi);
+         font-family:"Frank Ruhl Libre",David,serif}
+.who{color:var(--dim);font-size:12.5px}
+.ext{display:inline-block;margin:8px 0 4px;font-size:13.5px;color:#8fb8ff}
+/* the pages of a citation, one under the other, scrolling in the tab the way
+   the reader scrolls a book — not a big picture with thumbnails beside it */
+.pages{display:flex;flex-direction:column;align-items:center;gap:18px;margin-top:10px}
+figure{margin:0;text-align:center;width:100%;max-width:950px;scroll-margin-top:8px}
+figure img{display:block;margin:0 auto;width:100%;height:auto;border-radius:6px;
+           border:1px solid var(--line);background:var(--paper)}
+figure.cited img{border-color:var(--gold);box-shadow:0 0 0 2px #c8a94a55}
+figcaption{color:var(--dim);font-size:12px;margin-top:5px}
+figure.cited figcaption{color:var(--gold-hi)}
+blockquote.pg{background:var(--paper);color:#221b10;border-radius:8px;padding:14px 16px;margin:10px 0 0;
+              font-family:"Frank Ruhl Libre",David,serif;font-size:16px;white-space:pre-wrap}
+iframe.site{width:100%;height:calc(100vh - 130px);border:1px solid var(--line);border-radius:8px;
+            background:#fff;margin-top:8px}
+.nolink{color:var(--dim);font-size:13.5px;margin-top:10px}
+#welcome{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+         justify-content:center;text-align:center;color:#8d97b5;font-size:15px;padding:24px;gap:6px}
+#welcome b{font-family:"Frank Ruhl Libre",serif;font-size:23px;color:var(--gold)}
+@media(max-width:860px){
+  #chat{flex:1 1 100%;max-width:none;border:0}
+  #viewer{display:none}
+  body.reading #chat{display:none}
+  body.reading #viewer{display:flex;flex:1 1 100%}
+  body.reading #back{display:block}
+  iframe.site{height:calc(100vh - 150px)}
+}
+</style>
+<noscript><style>
+#viewer{display:block;flex:1 1 100%} .pane{position:static;display:block;
+border-top:1px solid var(--line);padding-top:14px} #tabbar,#welcome{display:none}
+#app{flex-direction:column} #chat{flex:none;max-width:none;border:0}
+</style></noscript>
+</head>
+<body>
+<div id="bar">
+  <button id="back">‹ לשיחה</button>
+  <h1>אני מחפש מידע על הצורה והתבנית של השירה המקראית, אם אפשר למצוא מה כתוב…</h1>
+  <span class="n">44 מקורות · 34 דפים מצורפים · 4 ציטוטים · 14 עם קישור לאתר המקור</span>
+</div>
+<div id="app">
+  <div id="chat">
+<div class="msg me">אני מחפש מידע על הצורה והתבנית של השירה המקראית, אם אפשר למצוא מה כתוב על זה במקורות הקדומים בחז&quot;ל בראשונים, ומה מבארים האחרונים, בדגש על מקורות ראשוניים ולא להימנע ממקורות מחקריים ולסכם את כלל היסודות על צורת התקבולת של השירה  המקראית ואיך לתארו בשפה מסורתית</div>
+<div class="msg ai"><b class="h">צורת השירה המקראית: מה אומרים חז"ל, הראשונים, האחרונים והמחקר</b><p><b>התשובה בקצרה:</b> יחידת היסוד של השירה המקראית היא פסוק שיש בו שני חצאים. אין בה משקל של הברות ואין בה חריזה. החצי השני קשור תמיד לראשון: הוא כופל אותו, מנגיד אליו, משלים אותו, ממשיך אותו או מעלה אותו. הראשונים ראו בכך "כפל הענין במלות שונות". האחרונים נחלקו אם יש בכתוב כפל גמור. המחקר המאוחר חזר, בלשונו, לרוב אותן הבחנות.</p><p>---</p><b class="h">א. חז"ל</b><p><b>1. אמירת השירה בשני חצאים</b></p><li>במשנה ובגמרא (סוטה) נחלקו איך נאמרה שירת הים: ר' עקיבא אומר "כגדול המקרא את ההלל", ישראל עונים רק "אשירה לה'". ר' אליעזר בנו של ר' יוסי הגלילי אומר שחזרו אחר משה על כל דבר. ר' נחמיה אומר "כסופר הפורס על שמע בבית הכנסת".</li><li>בתוספתא, לדעת ר' נחמיה, משה פותח חצי פסוק וישראל משלימים את החצי המקביל: "משה אומר עזי וזמרת יה, וישראל אומר זה אלי ואנוהו". <a href="#c1" class="cite">תורה שלמה יד, עמ' 106</a></li><li>זו עדות קדומה לכך שהפסוק השירי נתפס כשני חלקים, אחד "פותח" ואחד "גומר".</li><p><b>2. צורת הכתיבה</b></p><li>"כל השירות כולן נכתבות אריח על גבי לבינה ולבינה על גבי אריח", חוץ מעשרת בני המן ומלכי כנען. <a href="#c2" class="cite">קובץ שיטות קמאי מגילה, עמ' 221</a></li><li>פסקי הרי"ד מפרש: "כתב על גבי חלק וחלק על גבי כתב". <a href="#c2" class="cite">שם</a></li><p><b>3. הכרה בכפל מילים</b></p><li>במדרש תהלים: "זה אחד מחמשה דברים הכפולים במקרא", למשל "משפטי ודיני", "עדי ושהדי". הדברים מובאים אצל <a href="#c3" class="cite">גלס, פשט ודרש בפרשנותו של רש"י, עמ' 96</a>.</li><li>סגל מביא את המידה ה־19 מל"ב מידות של ר' אליעזר בנו של ר' יוסי הגלילי, "דבר שנאמר בזה והוא הדין לחבירו": "אור זרוע לצדיק ולישרי לב שמחה", והאור והשמחה חלים על שניהם. <a href="#c4" class="cite">סגל, תרביץ, עמ' 4</a></li><li>באותו מקום בהערה מביא סגל מחלוקת על "שש הנה... ושבע": לר' מאיר "שש ושבע הרי י"ג", ולרבנן שבע, "ושבע דכתיב זו שביעית שקשה כנגד כולם". <a href="#c5" class="cite">שם, עמ' 7</a></li><b class="h">ב. הראשונים</b><p><b>מנחם בן סרוק</b> – זה התיאור המפורש הקדום ביותר שמצאתי: "וחצי הפסוק יורה על חציו, והיה די בחציו והשנה ענינו שנית, ונמצא ענין אחד דבור פעמים בפסוק אחד". <a href="#c6" class="cite">מחברת מנחם, עמ' 12</a></p><p><b>רש"י</b></p><li>בתהלים ט, ה: "יש תיבות כפולות במקרא ואין חילוק ביניהן". <a href="#c7" class="cite">תורת חיים תהלים, עמ' 140</a></li><li>בשמות טו, ו מובא בשמו "ופשוטו של מקרא ימינך הנאדרת בכח מה מלאכתה... וכמה מקראות דוגמתו". לפי ההערה שם, זה אחד משני פירושים שאינם בדפוס הראשון. <a href="#c8" class="cite">לפשוטו של רש"י, עמ' 195</a></li><li>לדעת גלס, רש"י בדרך כלל ממעט בפירוש של כפל, בהשפעת דרך המדרש. <a href="#c9" class="cite">גלס, עמ' 97</a></li><p><b>רשב"ם</b> – הוא הגדיר את מה שקרוי היום "תקבולת מדורגת":</p><li>"חצי הראשון אינו מסיים דברו עד שיבא חצי האחרון וכופלו ומשלים דברו, אך בחצי הראשון מזכיר במי הוא מדבר". <a href="#c10" class="cite">מקראות גדולות שמות, עמ' 121</a></li><li>וכן בבראשית מט, כב, עם הדוגמאות "נשאו נהרות... נשאו נהרות קולם", "כי הנה אויביך... כי הנה אויביך יאבדו". <a href="#c11" class="cite">פירוש התורה לרשב"ם, עמ' 89</a></li><li>בהערה שם מובא החזקוני: "מנהג דברי שירה לכפול". <a href="#c11" class="cite">שם</a></li><li>שרה יפת מונה את הזיהוי הזה "כאחת הצורות של השירה המקראית" בין הישגיו הידועים של רשב"ם. היא גם מראה שבפירושיו לאיוב ולקהלת הוא משתמש בעקביות במונחים "כפל מלה", "מלה כפולה", "כופל מלתו". <a href="#c12" class="cite">פירוש רשב"ם לקהלת, עמ' 20</a>, <a href="#c13" class="cite">עמ' 25–26</a></li><p><b>ר' אברהם אבן עזרא</b></p><li>על "ימינך ה'": "והטעם כי פעם אחרי פעם". <a href="#c10" class="cite">מקראות גדולות שמות, עמ' 121</a></li><li>בויקרא טז, כט הוא למד מ"ונפש נענה תשביע" המקביל ל"ותפק לרעב נפשך", "כי דרך דברי הנביאים להכפל". <a href="#c14" class="cite">אבן עזרא ג, עמ' 50</a></li><p><b>רד"ק, רלב"ג, מצודות</b> (מובאים אצל אשכולי; את הטקסט המקורי לא קראתי):</p><li>רד"ק: "וכל כפל לחזק הענין". <a href="#c15" class="cite">אשכולי, עמ' 7</a></li><li>רלב"ג: "כפל הענין במלות שונות – זה כי דרך השירים". <a href="#c16" class="cite">שם, עמ' 6</a></li><li>מצודות: "וכדרך השיר", ובמקום אחר: "והוא כלל גדול בדברי הנביאים". <a href="#c16" class="cite">שם, עמ' 6</a>, <a href="#c15" class="cite">עמ' 7</a></li><p><b>ר' יהודה הלוי (כוזרי ב, ע–עב)</b></p><li>השירה העברית לא נבנתה על משקל: "כבר נתברר כי הנגונים אינם זקוקים ליפי המליצה השקולה". אותו ניגון מתאים ל"הודו לה' כי טוב" הקצר ול"לעשה נפלאות גדלות לבדו" הארוך.</li><li>במקום משקל באה מעלה אחרת: העברת הכוונה בדיבור החי, "בהפסקה שהוא מפסיק בדבורו" ובהמשכה. <a href="#c17" class="cite">כוזרי, תרגום אבן שמואל, עמ' 31</a></li><li>קוגל מציין שהכוזרי קושר זאת לטעמי המקרא. <a href="#c18" class="cite">ספרות המקרא א, עמ' 300</a></li><p><b>אברבנאל</b> (ישעיה ה)</p><li>הוא מונה "שלשה מינים" של שיר:</li><li>משקל וחריזה: "הן אמת שלא מצאנו דבר מזה המין מהשיר בדברי הנביאים", ולדעתו החל בגלות ארצות ישמעאל.</li><li>שיר שנקרא כך "מפאת הניגון והזמר בלבד", בלי משקל ובלי חרוז. מזה המין שירת הים, דבורה, דוד והאזינו, "ולכן היה אריח על גבי לבנה להורות על סדר הזמר והניגון".</li><li>שיר של משל והפלגה.</li><p><a href="#c19" class="cite">אברבנאל על ישעיהו, עמ' 47</a></p><li>בשירת דוד כתב שנטה מדרכי המפרשים "למעט ההכפל בהם כפי יכולתי". <a href="#c20" class="cite">קאפח, פירוש רי"ח לתהלים, עמ' 169</a></li><p><b>המחלוקת בדור גירוש ספרד</b></p><li>ר' יוסף אבן כספי: כל ספרי הקודש מלאים בכפל, "ואין התחכמות לתת טעמים וסיבות רק השתגעות". <a href="#c21" class="cite">קאפח, עמ' 166</a></li><li>מנגד ר' יוסף חיון ור' יוסף אבן יחייא שללו "כפל לריק לא לתכלית מיוחד". <a href="#c22" class="cite">שם, עמ' 170</a></li><li>ר' יוסף חיון מפרש לרוב את החצי השני כהעלאה: "אף גדול מחמה, וייסור גדול מתוכחה". <a href="#c23" class="cite">שם, עמ' 165</a></li><b class="h">ג. האחרונים</b><p><b>ר' עזריה מן האדומים (מאור עינים, אמרי בינה פרק ס)</b> – זו הניסוח המקיף ביותר שמצאתי:</p><li>הוא מקבל מהכוזרי ומאברבנאל שאין בשירי הקודש משקל של תנועות.</li><li>אבל לדעתו יש להם "מדות וערכים": "ערכיהם ומדותם הם במספר הענינים", כלומר לפי נושא, נשוא ומה שמצטרף אליהם. <a href="#c24" class="cite">מאור עינים, עמ' 490</a></li><li>דוגמתו: "ימינך ה'" הוא "מאמר אחד לעצמו בעל שני גבולים", "נאדרי בכח" דומה לו, ויחד הם ארבע מידות. האזינו בנויה שלש שלש. <a href="#c24" class="cite">שם</a></li><li>כלל בידו: "אין עליך למנות לא התנועות ולא המלות, רק הענינים". מידות של שתיים ושל שלש מתחלפות בשירה אחת. <a href="#c25" class="cite">עמ' 491</a></li><li>הוא מבחין גם בין תבניות הקינה באיכה. <a href="#c26" class="cite">עמ' 492</a></li><li>הוא מביא את המקורות הקדומים (יוסיפון, פילון, הירונימוס) שייחסו לשירות משקלות. <a href="#c27" class="cite">עמ' 489</a></li><p><b>המלבי"ם</b> – השלילה המפורשת והשיטתית ביותר:</p><li>"לא נמצא במליצות הנביאים כפל ענין במלות שונות, לא כפל ענין, לא כפל מאמר...".</li><li>את הכפולים הוא מיישב באחת משלש דרכים:</li><li>לכל משפט ענין מיוחד;</li><li>שני ענינים בשני זמנים או בשני מקומות;</li><li>המשפט השני מוסיף על הראשון.</li><li>ועוד כלל: "שהמליצה תעלה תמיד במושגיה מן הקל אל החמור".</li><li><a href="#c28" class="cite">מלמד, מחקרים במקרא, עמ' 449</a></li><li>בפירושו לתורה קבע כיסוד "שלא ימצא בשום מקום כפל ענין במלות שונות". <a href="#c29" class="cite">אשכולי, עמ' 11</a></li><li>אשכולי מונה באותה שיטה גם את הגר"א, הנצי"ב, המשך חכמה והראי"ה קוק. את דבריהם לא בדקתי במקור. <a href="#c30" class="cite">עמ' 10</a></li><b class="h">ד. המחקר</b><p><b>קוגל, "שירת המקרא – הא כיצד?"</b> (בעברית, בחתימה "יעקב כדורי")</p><li>לות (Lowth, 1753) קבע שלשה סוגים: תקבולת נרדפת, ניגודית ומשלימה. <a href="#c18" class="cite">ספרות המקרא א, עמ' 300</a></li><li>קוגל מראה שהסוג "המשלים" הוא בעצם "מגרה" לכל מה שאינו מתאים לשני האחרים, ושבטורים רבים אין תקבולת כלל. <a href="#c31" class="cite">עמ' 301</a></li><li>"היחידה הבסיסית בשירה המקראית היא טור בן שתי צלעות". יש הפוגה קצרה באמצע והפוגה ארוכה בסוף, בלי משקל קבוע ובלי חריזה. <a href="#c32" class="cite">עמ' 304</a></li><li>האמצעים לקשר בין הצלעות:</li><li>השמטת הפועל בצלע השנייה;</li><li>תלות דקדוקית;</li><li>צמדי מילים שגורים (יומם/לילה, שור/חמור);</li><li>נרדפות והיפוכים;</li><li>חזרה על אותו צירוף.</li><p><a href="#c33" class="cite">עמ' 305–306</a></p><li>הדרך השכיחה והמוצלחת היא "שלא לחזור על אותו הרעיון" אלא להעצים אותו: א, ולא עוד אלא ב. לכן במספרים הצלע השנייה גדולה תמיד (שלשה/ארבעה). <a href="#c34" class="cite">עמ' 309</a>, <a href="#c35" class="cite">עמ' 302</a></li><li>בדרך כלל הטור נגמר בסוף משפט (end-stopped), ולפעמים יש טור בן שלש צלעות. <a href="#c36" class="cite">עמ' 310</a></li><p><b>מ"צ סגל, "לחקר צורותיה של השירה המקראית"</b> (תרביץ, 1947)</p><li><b>המשכה קדמית:</b> מילה מהצלע הראשונה נמשכת לשנייה. <a href="#c37" class="cite">סגל, עמ' 1</a></li><li><b>המשכה אחורית:</b> מילה מהשנייה חוזרת לראשונה, כמו "ובן חכם [שמע] מוסר אב ולץ לא שמע גערה".</li><li><b>המשכה הדדית:</b> כמו "וכבודו מתי רעב והמונו צחה צמא", ששני החלקים חלים על שני הנושאים. <a href="#c38" class="cite">עמ' 3–4</a></li><li><b>המספר העולה:</b> לדעתו המספר השלם הוא זה שבצלע השנייה. <a href="#c4" class="cite">עמ' 4–5</a></li><p><b>עוד מחקרים שבקטלוג ולא קראתי:</b></p><li><a href="#c39" class="cite">Alter, The Art of Biblical Poetry</a></li><li><a href="#c40" class="cite">Biblical Poetry: Parallelism and Its History</a> – זה כנראה ספרו של קוגל, אף שהוא מתויק בתיקייה של Wendland.</li><li><a href="#c41" class="cite">Watson, Chiastic Patterns</a></li><li><a href="#c42" class="cite">Greenstein, Aspects of Biblical Poetry</a></li><li>על כתיבת השירות: <a href="#c43" class="cite">עופר, The Masora on Scripture</a> ו־<a href="#c44" class="cite">כתר ארם צובה והנוסח המקובל</a></li><p>---</p><b class="h">ה. היסודות בלשון מסורתית</b><li><b>"פסוק" בן שני חצאים ("חצי המקרא", רישא וסיפא).</b></li><li>מקורות: ר' נחמיה בתוספתא (משה פותח וישראל גומרים), מנחם ("חצי הפסוק יורה על חציו"), רשב"ם.</li><li>לפעמים יש שלשה חצאים.</li><li>החלוקה ניכרת בפסק הטעמים (הכוזרי).</li><li><b>אין "משקל" ואין "חרוז".</b></li><li>אלה אינם בדברי הנביאים (כוזרי, אברבנאל).</li><li>אם יש מידה, היא "משקל ענינים" ולא משקל תנועות (ר' עזריה).</li><li><b>החצי השני קשור לראשון באחת מכמה דרכים:</b></li><li><b>כפל הענין במלות שונות</b> (תקבולת נרדפת), "לחזק הענין" ו"כדרך השיר" (אבן עזרא, רד"ק, רלב"ג, מצודות).</li><li><b>ענין והפכו</b> (ניגודית) – זה ניסוח שלי, לא לשון של מקור שקראתי.</li><li><b>השלמה</b>: החצי השני גומר את מה שהראשון פתח (משלימה).</li><li><b>"חצי הראשון אינו מסיים דברו"</b>, כלומר כופל את ראש המקרא ומסיים (מדורגת, רשב"ם).</li><li><b>"דבר שנאמר בזה והוא הדין לחבירו"</b>: מילה אחת משמשת לשני החצאים (השמטה והמשכה, לפי המידה ה־19 ולפי סגל). לכך מתאים גם המונח "מושך עצמו ואחר עמו" – זה מזכרוני, ולא אימתתי אותו כאן.</li><li><b>מספר עולה</b>: "שלשה... וארבעה".</li><li><b>"מן הקל אל החמור".</b> לרוב החצי השני מוסיף ומעלה על הראשון.</li><li>אצל המלבי"ם ור' יוסף חיון זה כלל גמור.</li><li>אצל קוגל זו הדרך השכיחה.</li><li>אצל ראב"ע ורד"ק הכפל עצמו הוא לשם חיזוק.</li><li><b>שתי שיטות בפירוש הכפל:</b></li><li>"דרך צחות" ו"כמנהג הלשון" (ראב"ע, רד"ק, אבן כספי);</li><li>"אין כפל לריק" (ר' יוסף חיון, אבן יחייא, אברבנאל במידה, המלבי"ם).</li><li>דרך אמצעית אפשרית, והיא הצעה שלי: הצורה היא כפל, והתוכן מוסיף.</li><li><b>צורת הכתיבה משקפת את המבנה.</b> "אריח על גבי לבינה", ולדברי אברבנאל "להורות על סדר הזמר והניגון".</li><b class="h">מה לא בדקתי</b><li>את נוסח הבבלי (מגילה טז ע"ב, סוטה ל ע"ב) לא הצלחתי לקרוא ישירות. ציטטתי דרך קובץ שיטות קמאי ותורה שלמה.</li><li>מדרש תהלים ול"ב מידות מובאים ממחקרים (גלס, סגל), לא מהמקור.</li><li>דברי רד"ק, רלב"ג והמצודות מובאים מאשכולי. את פירושי רד"ק עצמם ראיתי רק בקטעי חיפוש.</li><li>לא בדקתי במקור את הנצי"ב, הגר"א, הביאור של מנדלסון, ויזל, שד"ל, אבן ג'נאח, משה אבן עזרא, מסכת סופרים והלכות ספר תורה לרמב"ם. ייתכן שיש בהם עוד על הנושא.</li></div>
+<details id="srcall"><summary>כל המקורות (44)</summary><div class="s" data-id="c1">תורה שלמה - יד <i>· עמוד 106</i> <i>· דף מצורף</i> <i>🌐</i></div><div class="s" data-id="c2">קובץ שיטות קמאי על מגילה <i>· עמוד 221</i> <i>· ציטוט</i></div><div class="s" data-id="c3">פשט ודרש בפרשנותו של רש&#x27;&#x27;י, בנימין גלס <i>· עמוד 96</i> <i>· דף מצורף</i></div><div class="s" data-id="c4">M.H. Segal <i>· עמוד 4</i> <i>· דף מצורף</i> <i>🌐</i></div><div class="s" data-id="c5">M.H. Segal <i>· עמוד 7</i> <i>· דף מצורף</i> <i>🌐</i></div><div class="s" data-id="c6">מחברת מנחם <i>· עמוד 12</i> <i>· ציטוט</i> <i>🌐</i></div><div class="s" data-id="c7">תורת חיים • תהלים א א מט • על פי המסורה של כתר ארם צובה • פירושי <i>· עמוד 140</i> <i>· דף מצורף</i></div><div class="s" data-id="c8">לפשוטו של רש&#x27;&#x27;י שמות שמואל פ גלברד <i>· עמוד 195</i> <i>· דף מצורף</i></div><div class="s" data-id="c9">פשט ודרש בפרשנותו של רש&#x27;&#x27;י, בנימין גלס <i>· עמוד 97</i> <i>· דף מצורף</i></div><div class="s" data-id="c10">חומש מקראות גדולות ב • שמות • אסתר • מהדורת נעטטער ווין תריט <i>· עמוד 121</i> <i>· דף מצורף</i></div><div class="s" data-id="c11">פירוש התורה לרשב&#x27;&#x27;ם שמואל בן מאיר <i>· עמוד 89</i> <i>· דף מצורף</i></div><div class="s" data-id="c12">פירוש רשב&#x27;&#x27;ם לקהלת <i>· עמוד 20</i> <i>· דף מצורף</i></div><div class="s" data-id="c13">פירוש רשב&#x27;&#x27;ם לקהלת <i>· עמוד 26</i> <i>· דף מצורף</i></div><div class="s" data-id="c14">אבן עזרא ג, מאוצר החכמה <i>· עמוד 50</i> <i>· דף מצורף</i></div><div class="s" data-id="c15">הלל אשכולי - מילים נרדפות - מציאות או דמיון <i>· עמוד 7</i> <i>· דף מצורף</i></div><div class="s" data-id="c16">הלל אשכולי - מילים נרדפות - מציאות או דמיון <i>· עמוד 6</i> <i>· דף מצורף</i></div><div class="s" data-id="c17">Kuzari [He] - Yehudah Even Shmuel <i>· עמוד 31</i> <i>· ציטוט</i></div><div class="s" data-id="c18">ספרות המקרא, מבואות ומחקרים - א <i>· עמוד 300</i> <i>· דף מצורף</i></div><div class="s" data-id="c19">אברבנאל על ישעיהו <i>· עמוד 47</i> <i>· ציטוט</i> <i>🌐</i></div><div class="s" data-id="c20">קאפח יוחנן <i>· עמוד 169</i> <i>· דף מצורף</i></div><div class="s" data-id="c21">קאפח יוחנן <i>· עמוד 166</i> <i>· דף מצורף</i></div><div class="s" data-id="c22">קאפח יוחנן <i>· עמוד 170</i> <i>· דף מצורף</i></div><div class="s" data-id="c23">קאפח יוחנן <i>· עמוד 165</i> <i>· דף מצורף</i></div><div class="s" data-id="c24">מאור עינים <i>· עמוד 490</i> <i>· דף מצורף</i> <i>🌐</i></div><div class="s" data-id="c25">מאור עינים <i>· עמוד 491</i> <i>· דף מצורף</i> <i>🌐</i></div><div class="s" data-id="c26">מאור עינים <i>· עמוד 492</i> <i>· דף מצורף</i> <i>🌐</i></div><div class="s" data-id="c27">מאור עינים <i>· עמוד 489</i> <i>· דף מצורף</i> <i>🌐</i></div><div class="s" data-id="c28">מחקרים במקרא בתרגומיו ובמפרשיו, מלמד.xps <i>· עמוד 449</i> <i>· דף מצורף</i></div><div class="s" data-id="c29">הלל אשכולי - מילים נרדפות - מציאות או דמיון <i>· עמוד 11</i> <i>· דף מצורף</i></div><div class="s" data-id="c30">הלל אשכולי - מילים נרדפות - מציאות או דמיון <i>· עמוד 10</i> <i>· דף מצורף</i></div><div class="s" data-id="c31">ספרות המקרא, מבואות ומחקרים - א <i>· עמוד 301</i> <i>· דף מצורף</i></div><div class="s" data-id="c32">ספרות המקרא, מבואות ומחקרים - א <i>· עמוד 304</i> <i>· דף מצורף</i></div><div class="s" data-id="c33">ספרות המקרא, מבואות ומחקרים - א <i>· עמוד 306</i> <i>· דף מצורף</i></div><div class="s" data-id="c34">ספרות המקרא, מבואות ומחקרים - א <i>· עמוד 309</i> <i>· דף מצורף</i></div><div class="s" data-id="c35">ספרות המקרא, מבואות ומחקרים - א <i>· עמוד 302</i> <i>· דף מצורף</i></div><div class="s" data-id="c36">ספרות המקרא, מבואות ומחקרים - א <i>· עמוד 310</i> <i>· דף מצורף</i></div><div class="s" data-id="c37">M.H. Segal <i>· עמוד 1</i> <i>· דף מצורף</i> <i>🌐</i></div><div class="s" data-id="c38">M.H. Segal <i>· עמוד 3</i> <i>· דף מצורף</i> <i>🌐</i></div><div class="s" data-id="c39">Art of Biblical Poetry (2nd Edition)</div><div class="s" data-id="c40">BIBLICAL POETRY： Parallelism and Its History <i>· Academia.edu</i></div><div class="s" data-id="c41">Chiastic Patterns in Biblical Hebrew Poetry <i>· Academia.edu</i></div><div class="s" data-id="c42">Aspects of Biblical Poetry <i>· Academia.edu</i></div><div class="s" data-id="c43">The Masora on Scripture and Its Methods</div><div class="s" data-id="c44">כתר ארם צובה והנוסח המקובל</div></details>
+  </div>
+  <div id="viewer">
+    <div id="tabbar"></div>
+    <div id="panes">
+      <div id="welcome"><b>המקורות</b><div>לחיצה על מראה־מקום בתשובה פותחת אותו כאן — הדף עצמו, או האתר שבו הוא מתפרסם.</div></div>
+<section class="pane" id="c1" data-title="תורה שלמה - יד"><h3>תורה שלמה - יד</h3>
+<div class="who">מנחם מנדל כשר · תשיא · עמוד 106</div>
+<a class="ext" href="https://hebrewbooks.org/pdfpager.aspx?req=9751&amp;pgnum=106" target="_blank" rel="noopener noreferrer">🌐 הספר המלא באתר המקור — היברובוקס</a>
+<div class="pages">
+<figure class=""><img loading="lazy" src="c1-105.jpg" width="950" height="1258" alt="עמוד 105"><figcaption>עמוד 105</figcaption></figure>
+<figure class="cited"><img loading="lazy" src="c1-106.jpg" width="950" height="1258" alt="עמוד 106 — המצוטט"><figcaption>עמוד 106 — המצוטט</figcaption></figure>
+<figure class=""><img loading="lazy" src="c1-107.jpg" width="950" height="1257" alt="עמוד 107"><figcaption>עמוד 107</figcaption></figure>
+</div></section>
+<section class="pane" id="c2" data-title="קובץ שיטות קמאי על מגילה"><h3>קובץ שיטות קמאי על מגילה</h3>
+<div class="who">עמוד 221</div>
+<blockquote class="pg">א אזדקיפו. 
+ [מחזור ויטרי סדר פורים סימן רמ&#x27;&#x27;ד] 
+------
+וצריך לומר עשרת בני המן בנשימה אחת ואם טעה או נאנס יחזור אותם מראש. 
+ [מחזור ויטרי סדר פורים סימן רמ&#x27;&#x27;ז] 
+------
+מצאתי בתשובות הגאונים. שליח ציבור הקורא את המגילה בציבור צריך לסידרה כאחת. מפני שהיא כאיגרת אחת. אבל בנשימה אחת אין צריך לאומרה. אלא לעשרת בני המן. הילכך אם מפסיק בין פסוק לפסוק אין בכך כלום. ואם פסק באמצע פסוק משום נשימה אין בכך כלום. ושיעורו בין פסוק לפסוק ובאמצע פסוק כדי נשימה בלבד. א&#x27;&#x27;ר חנינא בר פפא דרש רב שילא איש כפר תמרתא כל השירות כולן נכתבות אריח על גבי לבינה ולבינה על גבי אריח. חוץ מזו שאריח על גבי אריח ולבינה על גבי לבינה. מאי טעמ&#x27; כדי שלא תהא תקומה למפלתם של רשעים. וכן כתב ר&#x27;&#x27;ת בספרו בהלכות ספר תורה ששירת האזינו כתובה כבני המן שיש בה מפלה לעובדי ע&#x27;&#x27;ז. 
+ [מחזור ויטרי סימן רמ&#x27;&#x27;ו] 
+------
+אמר רב אדא דמן יפו עשרת בני המן ועשרת צריך לומר בנשימה אחת. מאי טעמא, כולהו בהדדי נפקו נשמתייהו. ואמר ר&#x27; זירא ו&#x27; דויזתא צריך למימתחיה בזקיפא. מאי טעמא, כולהו עשרה בחד זקיפה אזדקיפו. דברי שלום ואמת, אמר ר&#x27; יוסי מלמד שצריכה שרטוט כאמיתה של תורה. 
+ [ראב&#x27;&#x27;ן] 
+------
+בעו למימרינהו בנשימה אחת, כלומר שלא יפסיק בהן אפילו להשיב נשימתו אליו עד שיגמור שם כולם ועד תחלת הפסוק שלאחריהם שמתחיל עשרת בני המן. וא&#x27;&#x27;ו דויזתא צריך לממתחיה בזקיפא, כלומר צריך להאריך בה (בנועם) [בטעם] קריאתה ולא יחטוף אותה. ויש אומרים כי היא וא&#x27;&#x27;ו גדולה מחשבון אותיות גדולות שכתובין בעשרים וארבעה כל חשבון אל&#x27;&#x27;ף בי&#x27;&#x27;ת גי&#x27;&#x27;מל. 
+ [רבינו יהונתן מלוניל] 
+------
+בפ&#x27;&#x27;ב [ה&#x27;&#x27;ח] בירושלמי רבי חייא בר אבא דמן יפו צריך לומר בנשימה אחת ועשרת בני המן עמהם, ודכותיה איתא בגמרא דידן בני המן ועשרת בנשימה אחת, ולא מסיים בני המן כמו בירושלמי, ואנן סמכינן אגמרא דידן. ומספקא לי אי למצוה אי לעכב ולהחזיר, ובירושלמי בעי דכוותיה [לענין] אריח על גבי אריח דבני המן, ומסיק דלעכב, ולא ברירא לי הכא מאי. ותו מסיק בירושלמי אמר רבי יוסי בר בון צריך שיהא איש בראש דפא ואת בסופה שניץ ונחית כהדין קונטרא רב אמר צריך לומר ארור המן וארורים בניו אמר רבי פנחס [צריך לומר] חרבונה זכור לטוב. והעם נהגו לומר ארור. ובפרק שני דמכילתין בגמרא דידן גרסינן אמר רבא מחייב אינש לבסומי נפשיה עד דלא ידע בין ארור המן לברוך מרדכי. ונראה דכל הני צריך למצוה בעלמא ולא לעכוב. 
+ [ראבי&#x27;&#x27;ה סימן תקס&#x27;&#x27;ד] 
+------
+אמר רב אדא דמן יפו עשרת בני המן ועשרת בעי למימרינהו בנשימה אחת, מ&#x27;&#x27;ט כולהו בהדי הדדי נפיק נשמתייהו. א&#x27;&#x27;ר יונה א&#x27;&#x27;ר זירא וו דויזתא צריך למימתחיה, מ&#x27;&#x27;ט כולהו בחד זקיפא אזדקיפו, א&#x27;&#x27;ר חנינא בר פפא דרש ר&#x27; שילא איש כפר תמרתא כל השירות כולן אריח על גבי לבינה ולבינה על גבי אריח חוץ משירה זו שהיא אריח על גבי אריח ולבינה על גבי לבינה, מ&#x27;&#x27;ט כדי שלא תהא תקומה למפלתן. 
+ [המנהיג הלכ&#x27; מגילה] 
+------
+ …</blockquote></section>
+<section class="pane" id="c3" data-title="פשט ודרש בפרשנותו של רש&#x27;&#x27;י, בנימין גלס"><h3>פשט ודרש בפרשנותו של רש&#x27;&#x27;י, בנימין גלס</h3>
+<div class="who">עמוד 96</div>
+<div class="pages">
+<figure class=""><img loading="lazy" src="c3-95.jpg" width="950" height="1269" alt="עמוד 95"><figcaption>עמוד 95</figcaption></figure>
+<figure class="cited"><img loading="lazy" src="c3-96.jpg" width="950" height="1280" alt="עמוד 96 — המצוטט"><figcaption>עמוד 96 — המצוטט</figcaption></figure>
+<figure class=""><img loading="lazy" src="c3-97.jpg" width="950" height="1266" alt="עמוד 97"><figcaption>עמוד 97</figcaption></figure>
+</div></section>
+<section class="pane" id="c4" data-title="M.H. Segal"><h3>M.H. Segal</h3>
+<div class="who">1947 · עמוד 4</div>
+<a class="ext" href="https://www.academia.edu/43549744" target="_blank" rel="noopener noreferrer">🌐 הספר המלא באתר המקור — Academia.edu</a>
+<div class="pages">
+<figure class=""><img loading="lazy" src="c4-3.jpg" width="950" height="1543" alt="עמוד 3"><figcaption>עמוד 3</figcaption></figure>
+<figure class="cited"><img loading="lazy" src="c4-4.jpg" width="950" height="1543" alt="עמוד 4 — המצוטט"><figcaption>עמוד 4 — המצוטט</figcaption></figure>
+<figure class=""><img loading="lazy" src="c4-5.jpg" width="950" height="1543" alt="עמוד 5"><figcaption>עמוד 5</figcaption></figure>
+</div></section>
+<section class="pane" id="c5" data-title="M.H. Segal"><h3>M.H. Segal</h3>
+<div class="who">1947 · עמוד 7</div>
+<a class="ext" href="https://www.academia.edu/43549744" target="_blank" rel="noopener noreferrer">🌐 הספר המלא באתר המקור — Academia.edu</a>
+<div class="pages">
+<figure class=""><img loading="lazy" src="c5-6.jpg" width="950" height="1543" alt="עמוד 6"><figcaption>עמוד 6</figcaption></figure>
+<figure class="cited"><img loading="lazy" src="c5-7.jpg" width="950" height="1543" alt="עמוד 7 — המצוטט"><figcaption>עמוד 7 — המצוטט</figcaption></figure>
+</div></section>
+<section class="pane" id="c6" data-title="מחברת מנחם"><h3>מחברת מנחם</h3>
+<div class="who">מנחם בן יעקב אבן סרוק · תריד · עמוד 12</div>
+<a class="ext" href="https://mg.alhatorah.org/Full/Machberet_Menachem" target="_blank" rel="noopener noreferrer">🌐 הספר המלא באתר המקור — על התורה</a>
+<blockquote class="pg">ל&quot;ף לבד אשר לא יכפל בסוף המלה, וכה כפילתם: אאזרך (ישעיה מה ה) , אאלפך (איוב לג לג) , בבא אליו (תהלים נא ב) , בברית אשלחך (מ״א כ לד) , ההיתה זאת (יואל א ב) , העיר ההללה (יחזקאל כו יז) , בכסף ובזהב ייפהו (ירמיה י ד) , לא ייחל (מיכה ה ו) , ככלוב מלא (ירמיה ה כו) , ככלותו לדבר (שמות לא יח) , עת ללדת (קהלת ג ב) , גם מקום ללון (בראשית כד כה) , ממשלת (ירמיה לד א) , ממלכות (יהושע יג יב) , ששם עלו (תהלים קכב ד) , ששזפתני (שה&quot;ש א ו) , תתה לי ערף (ש&quot;ב כב מא) , תתקפהו (איוב יד כ) , כלם נכפלים זולתי וו לא יכפל כי אם בווי העמודים (שמות לח י) :
+וגם כה יכפלו באחרית המלים: סובב (קהלת א ו) , דובב (שה&quot;ש ז ו) , ינובב (זכריה ט יז) , חוגג (תהלים מב ה) , נודד (משלי כז ח) , לגבהה (צפניה ג יא) , לגזז (בראשית לא יט) , אשוחח (תהלים קמג ה) , לשומם (יהושע כג יג) , הסכך (נחום ב ו) , מחולל (משלי כו י) , ארומם (ישעיה לג י) , חונן (תהלים לו כא) , נסס (ישעיה י יח) , להתרועע (משלי יח כג) , ינופף (ישעיה י לב) , קצץ (שמות לט ג) , מחקק (בראשית מט ו) , תשתרר (במדבר טז יג) , בשש (שמות לב א) , ממותת (ש״א יד יג) , ורוב המלים יכפלו כמו אלה, נמצאו האותיות המשרתים נכפלים מפה ומפה, ויתר האותיות נשתוו עמהם באחרית ולא בתהלה, זולתי יוד לבדו אשר לא נכפל באחרית:
+תמה הפתיחה:
+ א 
+ הקדמה 
+מחברת אל&quot;ף
+אחל לבאר לשון יהודית, להעמיד כל מלה כפי שאת, יש מלה רבת פנים ולא יתבונן המשכיל יסודותיה, כי אם במהות ענינה אשר סביבותיה למרבית פניה, כי המלה מושכת והולכת עד אשר מתחלקת ממראה אחד עד חמשה עשר פנים, על כן יש מלה אשר הענין ימשכנה ויורה עליה וילמד על גזרתה. ויש מלה אשר היא מושכת הענין ומבארת הפתרון ושכל סודו, וכה הוא פתרון הלשון ופשר המלים לפי מחלקותיהם ותוצאותיהם.
+ 
+ א 
+ אב 
+מתחלק לששה פנים: המראה הראשון, אב ואם (אסתר ב, ז) , אבי כל תופש כנור (בראשית ד, כא) , אביב קלוי באש (ויקרא ב, יד) , והם אחודי דמיון שינויי פתרון ויסודתם אחת. &#x27;אב ואם&#x27; הוא אב לבנים, &#x27;אבי כל תופש כנור&#x27; הוא ראשון לכל תופשי כנור, &#x27;אביב&#x27; הוא ראשון לכל בכורים, תחלת כל כרמל, על קראו &#x27;אביב&#x27;. וגם יתכן להיות מגזרת אבי הנחל (שיר ו, יא) , בעבור רטיבתו ולחותו וקלייתו באש, וזה האחרון קרוב מן הראשון לתוכן ענינו.
+השני. ולא אבה יי&#x27; (דברים כג, ו) , ולא אביתם לעלות (שם א, כו) , אבי יבחן איוב עד נצח (איוב לד, לו) , ותפר האביונה (קהלת יב, ה) , כלם גזרה אחת הם, וכלם לשון רצון. ופתרון &#x27;אבי יבחן איוב&#x27;, רצוני ומאויי שיבחן איוב עד נצח, ופתרון &#x27;ותפר האביונה&#x27; תשבית תאות האדם ככלות כחו.
+השלישי. אבי הנחל (שיר ו, יא) , עודנו באבו לא יקטף (איוב ח, יב) , ופתרונו לשון &#x27;לחות פרי&#x27;, ובעלי ארמית בלשון זה ספרו עפיה שפיר ואנביה שגיא (דניאל ד, ט) , לא יתן פריו (ויקרא כו, כ) , לא יתן אביה.
+הרביעי. כאבות חדשים יבקע (איוב לב, יט) אין למלה זאת דמיון בתורה, אבל הענין יורה עליה, וחצי הפסוק יורה על חציו, והיה די בחציו והשנה ענינו שנית, ונמצא ענין אחד דבור פעמים בפסוק אחד וכהנה רב</blockquote></section>
+<section class="pane" id="c7" data-title="תורת חיים • תהלים א א מט • על פי המסורה של כתר ארם צובה • פירושי"><h3>תורת חיים • תהלים א א מט • על פי המסורה של כתר ארם צובה • פירושי</h3>
+<div class="who">עמוד 140</div>
+<div class="pages">
+<figure class=""><img loading="lazy" src="c7-139.jpg" width="950" height="1230" alt="עמוד 139"><figcaption>עמוד 139</figcaption></figure>
+<figure class="cited"><img loading="lazy" src="c7-140.jpg" width="950" height="1230" alt="עמוד 140 — המצוטט"><figcaption>עמוד 140 — המצוטט</figcaption></figure>
+<figure class=""><img loading="lazy" src="c7-141.jpg" width="950" height="1230" alt="עמוד 141"><figcaption>עמוד 141</figcaption></figure>
+</div></section>
+<section class="pane" id="c8" data-title="לפשוטו של רש&#x27;&#x27;י שמות שמואל פ גלברד"><h3>לפשוטו של רש&#x27;&#x27;י שמות שמואל פ גלברד</h3>
+<div class="who">Beir Yehidah · עמוד 195</div>
+<div class="pages">
+<figure class=""><img loading="lazy" src="c8-194.jpg" width="950" height="1344" alt="עמוד 194"><figcaption>עמוד 194</figcaption></figure>
+<figure class="cited"><img loading="lazy" src="c8-195.jpg" width="950" height="1344" alt="עמוד 195 — המצוטט"><figcaption>עמוד 195 — המצוטט</figcaption></figure>
+<figure class=""><img loading="lazy" src="c8-196.jpg" width="950" height="1344" alt="עמוד 196"><figcaption>עמוד 196</figcaption></figure>
+</div></section>
+<section class="pane" id="c9" data-title="פשט ודרש בפרשנותו של רש&#x27;&#x27;י, בנימין גלס"><h3>פשט ודרש בפרשנותו של רש&#x27;&#x27;י, בנימין גלס</h3>
+<div class="who">עמוד 97</div>
+<div class="pages">
+<figure class=""><img loading="lazy" src="c9-96.jpg" width="950" height="1280" alt="עמוד 96"><figcaption>עמוד 96</figcaption></figure>
+<figure class="cited"><img loading="lazy" src="c9-97.jpg" width="950" height="1266" alt="עמוד 97 — המצוטט"><figcaption>עמוד 97 — המצוטט</figcaption></figure>
+<figure class=""><img loading="lazy" src="c9-98.jpg" width="950" height="1282" alt="עמוד 98"><figcaption>עמוד 98</figcaption></figure>
+</div></section>
+<section class="pane" id="c10" data-title="חומש מקראות גדולות ב • שמות • אסתר • מהדורת נעטטער ווין תריט"><h3>חומש מקראות גדולות ב • שמות • אסתר • מהדורת נעטטער ווין תריט</h3>
+<div class="who">Beir Yehidah · עמוד 121</div>
+<div class="pages">
+<figure class=""><img loading="lazy" src="c10-120.jpg" width="950" height="1230" alt="עמוד 120"><figcaption>עמוד 120</figcaption></figure>
+<figure class="cited"><img loading="lazy" src="c10-121.jpg" width="950" height="1230" alt="עמוד 121 — המצוטט"><figcaption>עמוד 121 — המצוטט</figcaption></figure>
+<figure class=""><img loading="lazy" src="c10-122.jpg" width="950" height="1230" alt="עמוד 122"><figcaption>עמוד 122</figcaption></figure>
+</div></section>
+<section class="pane" id="c11" data-title="פירוש התורה לרשב&#x27;&#x27;ם שמואל בן מאיר"><h3>פירוש התורה לרשב&#x27;&#x27;ם שמואל בן מאיר</h3>
+<div class="who">עמוד 89</div>
+<div class="pages">
+<figure class=""><img loading="lazy" src="c11-88.jpg" width="950" height="1230" alt="עמוד 88"><figcaption>עמוד 88</figcaption></figure>
+<figure class="cited"><img loading="lazy" src="c11-89.jpg" width="950" height="1230" alt="עמוד 89 — המצוטט"><figcaption>עמוד 89 — המצוטט</figcaption></figure>
+<figure class=""><img loading="lazy" src="c11-90.jpg" width="950" height="1230" alt="עמוד 90"><figcaption>עמוד 90</figcaption></figure>
+</div></section>
+<section class="pane" id="c12" data-title="פירוש רשב&#x27;&#x27;ם לקהלת"><h3>פירוש רשב&#x27;&#x27;ם לקהלת</h3>
+<div class="who">עמודים 20–26</div>
+<div class="pages">
+<figure class=""><img loading="lazy" src="c12-19.jpg" width="950" height="1527" alt="עמוד 19"><figcaption>עמוד 19</figcaption></figure>
+<figure class="cited"><img loading="lazy" src="c12-20.jpg" width="950" height="1527" alt="עמוד 20 — המצוטט"><figcaption>עמוד 20 — המצוטט</figcaption></figure>
+<figure class=""><img loading="lazy" src="c12-21.jpg" width="950" height="1527" alt="עמוד 21"><figcaption>עמוד 21</figcaption></figure>
+<figure class=""><img loading="lazy" src="c12-22.jpg" width="950" height="1527" alt="עמוד 22"><figcaption>עמוד 22</figcaption></figure>
+<figure class=""><img loading="lazy" src="c12-23.jpg" width="950" height="1527" alt="עמוד 23"><figcaption>עמוד 23</figcaption></figure>
+<figure class=""><img loading="lazy" src="c12-24.jpg" width="950" height="1527" alt="עמוד 24"><figcaption>עמוד 24</figcaption></figure>
+<figure class=""><img loading="lazy" src="c12-25.jpg" width="950" height="1527" alt="עמוד 25"><figcaption>עמוד 25</figcaption></figure>
+<figure class=""><img loading="lazy" src="c12-26.jpg" width="950" height="1527" alt="עמוד 26"><figcaption>עמוד 26</figcaption></figure>
+<figure class=""><img loading="lazy" src="c12-27.jpg" width="950" height="1527" alt="עמוד 27"><figcaption>עמוד 27</figcaption></figure>
+</div></section>
+<section class="pane" id="c13" data-title="פירוש רשב&#x27;&#x27;ם לקהלת"><h3>פירוש רשב&#x27;&#x27;ם לקהלת</h3>
+<div class="who">עמוד 26</div>
+<div class="pages">
+<figure class=""><img loading="lazy" src="c13-25.jpg" width="950" height="1527" alt="עמוד 25"><figcaption>עמוד 25</figcaption></figure>
+<figure class="cited"><img loading="lazy" src="c13-26.jpg" width="950" height="1527" alt="עמוד 26 — המצוטט"><figcaption>עמוד 26 — המצוטט</figcaption></figure>
+<figure class=""><img loading="lazy" src="c13-27.jpg" width="950" height="1527" alt="עמוד 27"><figcaption>עמוד 27</figcaption></figure>
+</div></section>
+<section class="pane" id="c14" data-title="אבן עזרא ג, מאוצר החכמה"><h3>אבן עזרא ג, מאוצר החכמה</h3>
+<div class="who">עמוד 50</div>
+<div class="pages">
+<figure class=""><img loading="lazy" src="c14-49.jpg" width="835" height="1319" alt="עמוד 49"><figcaption>עמוד 49</figcaption></figure>
+<figure class="cited"><img loading="lazy" src="c14-50.jpg" width="834" height="1316" alt="עמוד 50 — המצוטט"><figcaption>עמוד 50 — המצוטט</figcaption></figure>
+<figure class=""><img loading="lazy" src="c14-51.jpg" width="807" height="1276" alt="עמוד 51"><figcaption>עמוד 51</figcaption></figure>
+</div></section>
+<section class="pane" id="c15" data-title="הלל אשכולי - מילים נרדפות - מציאות או דמיון"><h3>הלל אשכולי - מילים נרדפות - מציאות או דמיון</h3>
+<div class="who">עמוד 7</div>
+<div class="pages">
+<figure class=""><img loading="lazy" src="c15-6.jpg" width="950" height="1324" alt="עמוד 6"><figcaption>עמוד 6</figcaption></figure>
+<figure class="cited"><img loading="lazy" src="c15-7.jpg" width="950" height="1325" alt="עמוד 7 — המצוטט"><figcaption>עמוד 7 — המצוטט</figcaption></figure>
+<figure class=""><img loading="lazy" src="c15-8.jpg" width="950" height="1324" alt="עמוד 8"><figcaption>עמוד 8</figcaption></figure>
+</div></section>
+<section class="pane" id="c16" data-title="הלל אשכולי - מילים נרדפות - מציאות או דמיון"><h3>הלל אשכולי - מילים נרדפות - מציאות או דמיון</h3>
+<div class="who">עמוד 6</div>
+<div class="pages">
+<figure class=""><img loading="lazy" src="c16-5.jpg" width="950" height="1324" alt="עמוד 5"><figcaption>עמוד 5</figcaption></figure>
+<figure class="cited"><img loading="lazy" src="c16-6.jpg" width="950" height="1324" alt="עמוד 6 — המצוטט"><figcaption>עמוד 6 — המצוטט</figcaption></figure>
+<figure class=""><img loading="lazy" src="c16-7.jpg" width="950" height="1325" alt="עמוד 7"><figcaption>עמוד 7</figcaption></figure>
+</div></section>
+<section class="pane" id="c17" data-title="Kuzari [He] - Yehudah Even Shmuel"><h3>Kuzari [He] - Yehudah Even Shmuel</h3>
+<div class="who">1973 · עמוד 31</div>
+<blockquote class="pg">האמה אצילת היחש וזכת התכונה ובראש העוסקים בה דוד ושמואל מה דעתך אפוא האם היו יודעים את הנגינה ידיעה יסודית אם אין:
+(סה) אמר הכוזרי: אין ספק כי במקום הקדוש ההוא הגיעה האמנות הזאת לשלמות ולשכלול ושם עוררה את הנפשות כאשר יאמר עליה כי היא מעתיקה את הנפש ממדה אל הפכה אולם אין לדמות מדת חשיבותה היום למדרגתה אז כי פחת ערכה ואין עוסקים בה כיום כי אם משרתים וקלי דעת אכן ירד ירדה החבר על אף אצילותה כאשר ירדתם אתם חרף אצילותכם:
+(סו) אמר החבר: ומה דעתך על חכמת שלמה כי הוא דבר בכח אלוהי וברב שכלו ובכשר טבעו על כל החכמות ומקצוות העולם היו באים אליו לשמע חכמתו ולהעבירה אל האמות עד להדו ועד בכלל ובאמת שרשי כל החכמות וכלליהן העתקו מאתנו אל הכשדים בראשונה ואחרי כן אל פרס ומדי ואחרי כן אל יון ואחרי כן אל רומא אך מפאת רחק הזמן ורבוי המעתיקים לא הזכר בספרי החכמות כי העתקו מעברית הזכר רק כי העתקו מיונית ומרומית אולם יתרון העברית הוא גם מצד עצם הלשון וגם מצד תכן הענינים הכלולים בה:
+(סז) אמר הכוזרי: וכי יש לעברית מעלה על פני שאר הלשונות הלא בין אלה יש שלמות ועשירות ממנה כאשר אנו רואים זאת בעינינו:
+(סח) אמר החבר: קרה אותה מה שקרה את נושאיה נחלשה בהחלשם ונדלדלה בעקב התמעטם אולם מצד עצמה היא האצילה בלשונות כידוע לנו מפי המסרת ולפי ההקש ההגיוני על פי המסרת זאת היא הלשון אשר בה נגלה האלוה אל אדם ואל חוה ובה דברו השנים ביניהם ראיה לדבר השם אדם נגזר מן השם אדמה והשם אשה מן איש וחוה מן חי וקין מן קניתי ושת מן שת (וכן נח מן ינחמנו) ומלבד זה יש אתנו עדות התורה על כך וקבלת איש מפי איש עד עבר (ועבר הרי קבל מנח ונח מאדם) כי עברית היתה לשונו של עבר ועל שמו נקראה עברית כי הוא שמר עליה גם בדור הפלגה ובלבול הלשונות (ואברהם שמר עליה אחרי עבר) אמנם באור כשדים דבר אברהם ארמית כי הארמית היתה שפת הכשדים אולם העברית היתה לו לשון מיחדת במעלה לשון הקדש והארמית לשון חל אך ישמעאל בנו נשא את הארמית אל ארץ ערב וכך נעשו שלש הלשונות האלה הארמית הערבית והעברית דומות זו לזו באוצר השמות אשר להן ובנטיותיהן ובשמושיהן אשר ליתרון הלשון העברית מצד ההגיון הלא הוא מבחינת העם אשר מצאה נדרשת לו בדבור הנשגב ביחוד בהיות הנבואה נפוצה בקרב העם הזה עם זה אהב את נאומי התוכחות ואת השירות והתהלות מלכיו היו משה ויהושע ודוד ושלמה היתכן כי חסרה להם מליצה לדבר אשר בקשו להביע בכל אלה כמו שתחסר לנו היום הואיל ואבדה הלשון מפינו ראה נא איך נהגה התורה מדי הצרכה אל שמות שאינם שכיחים למשל בתאור המשכן האפוד והחשן ועוד איך מצאה את הבטוי השלם ביותר וכמה נאה סדור הספור ההוא והוא הדין בשמות האמות ובשמות מיני העופות ומיני האבנים התבונן עוד בשירי התהלה לדוד ובטענות איוב בהתוכחו עם חבריו ובתוכחות ישעיה וביעודי השכר והענש אשר בדבריו ובכל הדומה לזה:
+(סט) אמר הכוזרי: …</blockquote></section>
+<section class="pane" id="c18" data-title="ספרות המקרא, מבואות ומחקרים - א"><h3>ספרות המקרא, מבואות ומחקרים - א</h3>
+<div class="who">עמוד 300</div>
+<div class="pages">
+<figure class=""><img loading="lazy" src="c18-299.jpg" width="950" height="1281" alt="עמוד 299"><figcaption>עמוד 299</figcaption></figure>
+<figure class="cited"><img loading="lazy" src="c18-300.jpg" width="950" height="1281" alt="עמוד 300 — המצוטט"><figcaption>עמוד 300 — המצוטט</figcaption></figure>
+<figure class=""><img loading="lazy" src="c18-301.jpg" width="950" height="1281" alt="עמוד 301"><figcaption>עמוד 301</figcaption></figure>
+</div></section>
+<section class="pane" id="c19" data-title="אברבנאל על ישעיהו"><h3>אברבנאל על ישעיהו</h3>
+<div class="who">עמוד 47</div>
+<a class="ext" href="https://www.sefaria.org.il/Abarbanel_on_Isaiah" target="_blank" rel="noopener noreferrer">🌐 הספר המלא באתר המקור — sefaria.org.il</a>
+<blockquote class="pg">&#x27; צבאות במשפט וגומר, ורעו כבשים כדברם, ויראה שזהו ענין נחמה ואיך אם כן הביאו בתוך הקינה, ואם רצה לנחמם ולדבר על לבם ממה שיהיה אחרי גאולתם היה ראוי שיזכיר זה אחרי הרעות שזכרם חמשת הפעמים אשר אמר הוי ולא באמצעותן:
+השאלה הששית במה שאמר הוי חכמים בעיניהם וגו&#x27; הוי גבורים לשתות יין, וראה שכח זה המאמר הוא עצמו מה שאמר למעלה הוי האומרים לרע טוב ולטוב רע כי לסכלותן לא היו נותנין המשפט האמתי בדברים, ואם היו שתי הקינות האלה לכוונה אחת תהיה אם כן אחת מהן ללא צורך, וכן אמרו הוי גבורים לשתות יין בכלל כמו שאמר הוי משכימי בבקר שכר ירדופו, ויהיה הדבור אם כן מוכפל, גם יקשה למה לא אמר גם כן הוי בפסוק מצדיקי רשע עקב שוחד וצדקת צדיקים יסורו ממנו, כי הוא בפני עצמו וקשה ומר ויותר חמור משאר המאמרים שזכר בהם הוי: והנני מפרש הפסוקים באופן שיותרו השאלות כולם:
+הכוונה הכוללת בנבואה הזאת כפי פרשיותיה היא לסדר בדרך שירה חרבן עשרת השבטים וגלות שומרון, ולהודיע סבתו ולקח שופטים בדבר את יושבי ירושלם ואיש יהודה, ועשה חלוקים בשירה מענין משל הכרם, וביאר אותם אחד לאחד בנמשל, ואמר על אחד מהם אוי וקינה כמקונן על רעת מלכות ישראל וחרבנו וכמו שיתבאר בפסוקים:
+ אשירה נא לידידי וגו&#x27;, הנה בענין השירה הנמצאת בדברי הנביאים ראיתי להודיעך בה שתי הודעות: ההודעה הראשונה שנמצא אצלנו מן השיר שלשה מינים, המין האחד הוא בדברים הנעשים במדה במשקל ובמשורה, אף על פי שיהיו נקראים בלי ניגון, לפי שענין השיר בהם אינו, כי אם בהסכמת הדברים דמויים ושורים בסוף המאמרים, רוצה לומר בקצוות בתי השירים הדומים זה לזה בשלש אותיות אחרונות או בשתים כפי נקודם ואופן קריאתם, ונקראו חרוזים לפי שהם שבילים מסודרים מלשון צוארך בחרוזים שהם אבנים טובות ומרגליות נקובות מחוברות בסדר מוגבל שמור, וכן בדבריהם ז&quot;ל (ב&quot;מ כ&quot;ג, ע&quot;ב) מחרוזות של דגים, שהם שורות של דגים מחוברים זה לזה בחוטמם בגמי, ומפני הדמוי הזה נקראו השירים האלה חרוזים, להיותם שורות שוות ומתיחסות כי היו הדברים בזה המין מהשיר שקולים בענין המלכים והעבדים אשר בנקוד: והמלאכה הזאת מהמין הזה בשירים היא מלאכת ה&#x27; מתוקים מדבש ונופת צופים ונעשו בלשוננו הקדוש בשלמות גדול מה שלא נעשה כמוהו בלשון אחר, הן אמת שלא מצאנו דבר מזה המין מהשיר בדברי הנביאים, וגם לא מחכמי התלמוד, כי היתה לדעתי התחלתו בגלות בין חכמי ישראל אשר היו בארצות הישמעאלים שלמדו ממעשיהם במלאכת השיר הזה ויעשו גם המה בחכמה בלשוננו הקדוש ביתר שאת ויתר עז ממה שהיו עושים הישמעאלים עצמן בלשונם, וגם בחכמי אדום בלשון הלטי&quot;ן ובלשון לועז גוי גוי בלשונו נמצאו גם כן מאלו השירים השקולים, אבל לא באותו שלמות שנעשו בלשון הקדש בארץ הישמעאלים, ואחר כך נעתק הענין אל חכמי אומתנו אשר היו בפררווינצי&quot;א וקטאלוני&quot;א וארא&quot;גון, וידברו באלהים ובכל מלאכת מחשבת כפלים לתושיה מה מתוק מדבש ומה עז מארי, ובכל מקום אשר היו בו חכמי ישראל בגלותם נתפשט השיר הזה אם מעט ואם הרבה סוף הדבר שהיה זה המין הראשון מהשיר כפי מספר המלות וסדר הנקודות ושוויים במספרם כמשפט: …</blockquote></section>
+<section class="pane" id="c20" data-title="קאפח יוחנן"><h3>קאפח יוחנן</h3>
+<div class="who">עמוד 169</div>
+<div class="pages">
+<figure class=""><img loading="lazy" src="c20-168.jpg" width="950" height="1344" alt="עמוד 168"><figcaption>עמוד 168</figcaption></figure>
+<figure class="cited"><img loading="lazy" src="c20-169.jpg" width="950" height="1344" alt="עמוד 169 — המצוטט"><figcaption>עמוד 169 — המצוטט</figcaption></figure>
+<figure class=""><img loading="lazy" src="c20-170.jpg" width="950" height="1344" alt="עמוד 170"><figcaption>עמוד 170</figcaption></figure>
+</div></section>
+<section class="pane" id="c21" data-title="קאפח יוחנן"><h3>קאפח יוחנן</h3>
+<div class="who">עמוד 166</div>
+<div class="pages">
+<figure class=""><img loading="lazy" src="c21-165.jpg" width="950" height="1344" alt="עמוד 165"><figcaption>עמוד 165</figcaption></figure>
+<figure class="cited"><img loading="lazy" src="c21-166.jpg" width="950" height="1344" alt="עמוד 166 — המצוטט"><figcaption>עמוד 166 — המצוטט</figcaption></figure>
+<figure class=""><img loading="lazy" src="c21-167.jpg" width="950" height="1344" alt="עמוד 167"><figcaption>עמוד 167</figcaption></figure>
+</div></section>
+<section class="pane" id="c22" data-title="קאפח יוחנן"><h3>קאפח יוחנן</h3>
+<div class="who">עמוד 170</div>
+<div class="pages">
+<figure class=""><img loading="lazy" src="c22-169.jpg" width="950" height="1344" alt="עמוד 169"><figcaption>עמוד 169</figcaption></figure>
+<figure class="cited"><img loading="lazy" src="c22-170.jpg" width="950" height="1344" alt="עמוד 170 — המצוטט"><figcaption>עמוד 170 — המצוטט</figcaption></figure>
+<figure class=""><img loading="lazy" src="c22-171.jpg" width="950" height="1344" alt="עמוד 171"><figcaption>עמוד 171</figcaption></figure>
+</div></section>
+<section class="pane" id="c23" data-title="קאפח יוחנן"><h3>קאפח יוחנן</h3>
+<div class="who">עמוד 165</div>
+<div class="pages">
+<figure class=""><img loading="lazy" src="c23-164.jpg" width="950" height="1344" alt="עמוד 164"><figcaption>עמוד 164</figcaption></figure>
+<figure class="cited"><img loading="lazy" src="c23-165.jpg" width="950" height="1344" alt="עמוד 165 — המצוטט"><figcaption>עמוד 165 — המצוטט</figcaption></figure>
+<figure class=""><img loading="lazy" src="c23-166.jpg" width="950" height="1344" alt="עמוד 166"><figcaption>עמוד 166</figcaption></figure>
+</div></section>
+<section class="pane" id="c24" data-title="מאור עינים"><h3>מאור עינים</h3>
+<div class="who">עזריה בן משה די רוסי · תרכו · עמוד 490</div>
+<a class="ext" href="https://hebrewbooks.org/pdfpager.aspx?req=20254&amp;pgnum=490" target="_blank" rel="noopener noreferrer">🌐 הספר המלא באתר המקור — היברובוקס</a>
+<div class="pages">
+<figure class=""><img loading="lazy" src="c24-489.jpg" width="950" height="1322" alt="עמוד 489"><figcaption>עמוד 489</figcaption></figure>
+<figure class="cited"><img loading="lazy" src="c24-490.jpg" width="950" height="1322" alt="עמוד 490 — המצוטט"><figcaption>עמוד 490 — המצוטט</figcaption></figure>
+<figure class=""><img loading="lazy" src="c24-491.jpg" width="950" height="1314" alt="עמוד 491"><figcaption>עמוד 491</figcaption></figure>
+</div></section>
+<section class="pane" id="c25" data-title="מאור עינים"><h3>מאור עינים</h3>
+<div class="who">עזריה בן משה די רוסי · תרכו · עמוד 491</div>
+<a class="ext" href="https://hebrewbooks.org/pdfpager.aspx?req=20254&amp;pgnum=491" target="_blank" rel="noopener noreferrer">🌐 הספר המלא באתר המקור — היברובוקס</a>
+<div class="pages">
+<figure class=""><img loading="lazy" src="c25-490.jpg" width="950" height="1322" alt="עמוד 490"><figcaption>עמוד 490</figcaption></figure>
+<figure class="cited"><img loading="lazy" src="c25-491.jpg" width="950" height="1314" alt="עמוד 491 — המצוטט"><figcaption>עמוד 491 — המצוטט</figcaption></figure>
+<figure class=""><img loading="lazy" src="c25-492.jpg" width="950" height="1307" alt="עמוד 492"><figcaption>עמוד 492</figcaption></figure>
+</div></section>
+<section class="pane" id="c26" data-title="מאור עינים"><h3>מאור עינים</h3>
+<div class="who">עזריה בן משה די רוסי · תרכו · עמוד 492</div>
+<a class="ext" href="https://hebrewbooks.org/pdfpager.aspx?req=20254&amp;pgnum=492" target="_blank" rel="noopener noreferrer">🌐 הספר המלא באתר המקור — היברובוקס</a>
+<div class="pages">
+<figure class=""><img loading="lazy" src="c26-491.jpg" width="950" height="1314" alt="עמוד 491"><figcaption>עמוד 491</figcaption></figure>
+<figure class="cited"><img loading="lazy" src="c26-492.jpg" width="950" height="1307" alt="עמוד 492 — המצוטט"><figcaption>עמוד 492 — המצוטט</figcaption></figure>
+<figure class=""><img loading="lazy" src="c26-493.jpg" width="950" height="1311" alt="עמוד 493"><figcaption>עמוד 493</figcaption></figure>
+</div></section>
+<section class="pane" id="c27" data-title="מאור עינים"><h3>מאור עינים</h3>
+<div class="who">עזריה בן משה די רוסי · תרכו · עמוד 489</div>
+<a class="ext" href="https://hebrewbooks.org/pdfpager.aspx?req=20254&amp;pgnum=489" target="_blank" rel="noopener noreferrer">🌐 הספר המלא באתר המקור — היברובוקס</a>
+<div class="pages">
+<figure class=""><img loading="lazy" src="c27-488.jpg" width="950" height="1318" alt="עמוד 488"><figcaption>עמוד 488</figcaption></figure>
+<figure class="cited"><img loading="lazy" src="c27-489.jpg" width="950" height="1322" alt="עמוד 489 — המצוטט"><figcaption>עמוד 489 — המצוטט</figcaption></figure>
+<figure class=""><img loading="lazy" src="c27-490.jpg" width="950" height="1322" alt="עמוד 490"><figcaption>עמוד 490</figcaption></figure>
+</div></section>
+<section class="pane" id="c28" data-title="מחקרים במקרא בתרגומיו ובמפרשיו, מלמד.xps"><h3>מחקרים במקרא בתרגומיו ובמפרשיו, מלמד.xps</h3>
+<div class="who">עמוד 449</div>
+<div class="pages">
+<figure class=""><img loading="lazy" src="c28-448.jpg" width="950" height="1344" alt="עמוד 448"><figcaption>עמוד 448</figcaption></figure>
+<figure class="cited"><img loading="lazy" src="c28-449.jpg" width="950" height="1344" alt="עמוד 449 — המצוטט"><figcaption>עמוד 449 — המצוטט</figcaption></figure>
+<figure class=""><img loading="lazy" src="c28-450.jpg" width="950" height="1344" alt="עמוד 450"><figcaption>עמוד 450</figcaption></figure>
+</div></section>
+<section class="pane" id="c29" data-title="הלל אשכולי - מילים נרדפות - מציאות או דמיון"><h3>הלל אשכולי - מילים נרדפות - מציאות או דמיון</h3>
+<div class="who">עמוד 11</div>
+<div class="pages">
+<figure class=""><img loading="lazy" src="c29-10.jpg" width="950" height="1324" alt="עמוד 10"><figcaption>עמוד 10</figcaption></figure>
+<figure class="cited"><img loading="lazy" src="c29-11.jpg" width="950" height="1325" alt="עמוד 11 — המצוטט"><figcaption>עמוד 11 — המצוטט</figcaption></figure>
+<figure class=""><img loading="lazy" src="c29-12.jpg" width="950" height="1324" alt="עמוד 12"><figcaption>עמוד 12</figcaption></figure>
+</div></section>
+<section class="pane" id="c30" data-title="הלל אשכולי - מילים נרדפות - מציאות או דמיון"><h3>הלל אשכולי - מילים נרדפות - מציאות או דמיון</h3>
+<div class="who">עמוד 10</div>
+<div class="pages">
+<figure class=""><img loading="lazy" src="c30-9.jpg" width="950" height="1324" alt="עמוד 9"><figcaption>עמוד 9</figcaption></figure>
+<figure class="cited"><img loading="lazy" src="c30-10.jpg" width="950" height="1324" alt="עמוד 10 — המצוטט"><figcaption>עמוד 10 — המצוטט</figcaption></figure>
+<figure class=""><img loading="lazy" src="c30-11.jpg" width="950" height="1325" alt="עמוד 11"><figcaption>עמוד 11</figcaption></figure>
+</div></section>
+<section class="pane" id="c31" data-title="ספרות המקרא, מבואות ומחקרים - א"><h3>ספרות המקרא, מבואות ומחקרים - א</h3>
+<div class="who">עמוד 301</div>
+<div class="pages">
+<figure class=""><img loading="lazy" src="c31-300.jpg" width="950" height="1281" alt="עמוד 300"><figcaption>עמוד 300</figcaption></figure>
+<figure class="cited"><img loading="lazy" src="c31-301.jpg" width="950" height="1281" alt="עמוד 301 — המצוטט"><figcaption>עמוד 301 — המצוטט</figcaption></figure>
+<figure class=""><img loading="lazy" src="c31-302.jpg" width="950" height="1281" alt="עמוד 302"><figcaption>עמוד 302</figcaption></figure>
+</div></section>
+<section class="pane" id="c32" data-title="ספרות המקרא, מבואות ומחקרים - א"><h3>ספרות המקרא, מבואות ומחקרים - א</h3>
+<div class="who">עמודים 304–306</div>
+<div class="pages">
+<figure class=""><img loading="lazy" src="c32-303.jpg" width="950" height="1281" alt="עמוד 303"><figcaption>עמוד 303</figcaption></figure>
+<figure class="cited"><img loading="lazy" src="c32-304.jpg" width="950" height="1281" alt="עמוד 304 — המצוטט"><figcaption>עמוד 304 — המצוטט</figcaption></figure>
+<figure class=""><img loading="lazy" src="c32-305.jpg" width="950" height="1281" alt="עמוד 305"><figcaption>עמוד 305</figcaption></figure>
+<figure class=""><img loading="lazy" src="c32-306.jpg" width="950" height="1281" alt="עמוד 306"><figcaption>עמוד 306</figcaption></figure>
+<figure class=""><img loading="lazy" src="c32-307.jpg" width="950" height="1281" alt="עמוד 307"><figcaption>עמוד 307</figcaption></figure>
+</div></section>
+<section class="pane" id="c33" data-title="ספרות המקרא, מבואות ומחקרים - א"><h3>ספרות המקרא, מבואות ומחקרים - א</h3>
+<div class="who">עמוד 306</div>
+<div class="pages">
+<figure class=""><img loading="lazy" src="c33-305.jpg" width="950" height="1281" alt="עמוד 305"><figcaption>עמוד 305</figcaption></figure>
+<figure class="cited"><img loading="lazy" src="c33-306.jpg" width="950" height="1281" alt="עמוד 306 — המצוטט"><figcaption>עמוד 306 — המצוטט</figcaption></figure>
+<figure class=""><img loading="lazy" src="c33-307.jpg" width="950" height="1281" alt="עמוד 307"><figcaption>עמוד 307</figcaption></figure>
+</div></section>
+<section class="pane" id="c34" data-title="ספרות המקרא, מבואות ומחקרים - א"><h3>ספרות המקרא, מבואות ומחקרים - א</h3>
+<div class="who">עמוד 309</div>
+<div class="pages">
+<figure class=""><img loading="lazy" src="c34-308.jpg" width="950" height="1280" alt="עמוד 308"><figcaption>עמוד 308</figcaption></figure>
+<figure class="cited"><img loading="lazy" src="c34-309.jpg" width="950" height="1281" alt="עמוד 309 — המצוטט"><figcaption>עמוד 309 — המצוטט</figcaption></figure>
+<figure class=""><img loading="lazy" src="c34-310.jpg" width="950" height="1281" alt="עמוד 310"><figcaption>עמוד 310</figcaption></figure>
+</div></section>
+<section class="pane" id="c35" data-title="ספרות המקרא, מבואות ומחקרים - א"><h3>ספרות המקרא, מבואות ומחקרים - א</h3>
+<div class="who">עמוד 302</div>
+<div class="pages">
+<figure class=""><img loading="lazy" src="c35-301.jpg" width="950" height="1281" alt="עמוד 301"><figcaption>עמוד 301</figcaption></figure>
+<figure class="cited"><img loading="lazy" src="c35-302.jpg" width="950" height="1281" alt="עמוד 302 — המצוטט"><figcaption>עמוד 302 — המצוטט</figcaption></figure>
+<figure class=""><img loading="lazy" src="c35-303.jpg" width="950" height="1281" alt="עמוד 303"><figcaption>עמוד 303</figcaption></figure>
+</div></section>
+<section class="pane" id="c36" data-title="ספרות המקרא, מבואות ומחקרים - א"><h3>ספרות המקרא, מבואות ומחקרים - א</h3>
+<div class="who">עמוד 310</div>
+<div class="pages">
+<figure class=""><img loading="lazy" src="c36-309.jpg" width="950" height="1281" alt="עמוד 309"><figcaption>עמוד 309</figcaption></figure>
+<figure class="cited"><img loading="lazy" src="c36-310.jpg" width="950" height="1281" alt="עמוד 310 — המצוטט"><figcaption>עמוד 310 — המצוטט</figcaption></figure>
+<figure class=""><img loading="lazy" src="c36-311.jpg" width="950" height="1281" alt="עמוד 311"><figcaption>עמוד 311</figcaption></figure>
+</div></section>
+<section class="pane" id="c37" data-title="M.H. Segal"><h3>M.H. Segal</h3>
+<div class="who">1947 · עמודים 1–4</div>
+<a class="ext" href="https://www.academia.edu/43549744" target="_blank" rel="noopener noreferrer">🌐 הספר המלא באתר המקור — Academia.edu</a>
+<div class="pages">
+<figure class="cited"><img loading="lazy" src="c37-1.jpg" width="950" height="1543" alt="עמוד 1 — המצוטט"><figcaption>עמוד 1 — המצוטט</figcaption></figure>
+<figure class=""><img loading="lazy" src="c37-2.jpg" width="950" height="1543" alt="עמוד 2"><figcaption>עמוד 2</figcaption></figure>
+<figure class=""><img loading="lazy" src="c37-3.jpg" width="950" height="1543" alt="עמוד 3"><figcaption>עמוד 3</figcaption></figure>
+<figure class=""><img loading="lazy" src="c37-4.jpg" width="950" height="1543" alt="עמוד 4"><figcaption>עמוד 4</figcaption></figure>
+<figure class=""><img loading="lazy" src="c37-5.jpg" width="950" height="1543" alt="עמוד 5"><figcaption>עמוד 5</figcaption></figure>
+</div></section>
+<section class="pane" id="c38" data-title="M.H. Segal"><h3>M.H. Segal</h3>
+<div class="who">1947 · עמודים 3–5</div>
+<a class="ext" href="https://www.academia.edu/43549744" target="_blank" rel="noopener noreferrer">🌐 הספר המלא באתר המקור — Academia.edu</a>
+<div class="pages">
+<figure class=""><img loading="lazy" src="c38-2.jpg" width="950" height="1543" alt="עמוד 2"><figcaption>עמוד 2</figcaption></figure>
+<figure class="cited"><img loading="lazy" src="c38-3.jpg" width="950" height="1543" alt="עמוד 3 — המצוטט"><figcaption>עמוד 3 — המצוטט</figcaption></figure>
+<figure class=""><img loading="lazy" src="c38-4.jpg" width="950" height="1543" alt="עמוד 4"><figcaption>עמוד 4</figcaption></figure>
+<figure class=""><img loading="lazy" src="c38-5.jpg" width="950" height="1543" alt="עמוד 5"><figcaption>עמוד 5</figcaption></figure>
+<figure class=""><img loading="lazy" src="c38-6.jpg" width="950" height="1543" alt="עמוד 6"><figcaption>עמוד 6</figcaption></figure>
+</div></section>
+<section class="pane" id="c39" data-title="Art of Biblical Poetry (2nd Edition)"><h3>Art of Biblical Poetry (2nd Edition)</h3>
+<div class="who">Alter, Robert(Author)</div>
+<div class="nolink">הדף הזה אינו זמין כאן.</div></section>
+<section class="pane" id="c40" data-title="BIBLICAL POETRY： Parallelism and Its History"><h3>BIBLICAL POETRY： Parallelism and Its History</h3>
+<a class="ext" href="https://www.academia.edu/41839957" target="_blank" rel="noopener noreferrer">🌐 הספר המלא באתר המקור — Academia.edu</a>
+<div class="nolink">האתר אינו נפתח בתוך עמוד אחר — הקישור למעלה פותח אותו בלשונית חדשה.</div></section>
+<section class="pane" id="c41" data-title="Chiastic Patterns in Biblical Hebrew Poetry"><h3>Chiastic Patterns in Biblical Hebrew Poetry</h3>
+<a class="ext" href="https://www.academia.edu/92812656" target="_blank" rel="noopener noreferrer">🌐 הספר המלא באתר המקור — Academia.edu</a>
+<div class="nolink">האתר אינו נפתח בתוך עמוד אחר — הקישור למעלה פותח אותו בלשונית חדשה.</div></section>
+<section class="pane" id="c42" data-title="Aspects of Biblical Poetry"><h3>Aspects of Biblical Poetry</h3>
+<a class="ext" href="https://www.academia.edu/23619806" target="_blank" rel="noopener noreferrer">🌐 הספר המלא באתר המקור — Academia.edu</a>
+<div class="nolink">האתר אינו נפתח בתוך עמוד אחר — הקישור למעלה פותח אותו בלשונית חדשה.</div></section>
+<section class="pane" id="c43" data-title="The Masora on Scripture and Its Methods"><h3>The Masora on Scripture and Its Methods</h3>
+<div class="who">Yosef Ofer;</div>
+<div class="nolink">הדף הזה אינו זמין כאן.</div></section>
+<section class="pane" id="c44" data-title="כתר ארם צובה והנוסח המקובל"><h3>כתר ארם צובה והנוסח המקובל</h3>
+<div class="nolink">הדף הזה אינו זמין כאן.</div></section>
+    </div>
+  </div>
+</div>
+
+<div style="position:fixed;bottom:0;inset-inline-start:0;font-size:11px;color:#5a6885;
+     background:#0c1526cc;padding:3px 10px;border-top-left-radius:8px">מתוך ספרייה פרטית · 2026-09-15</div>
+<script>
+/* the tab strip of the library, in one page: every citation carries the number
+   of its source pane; opening one adds a tab, and the tabs behave like the
+   app's (click to switch, ✕ to close, newest wins). */
+const panes = new Map([...document.querySelectorAll(".pane")].map(p => [p.id, p]));
+const bar = document.getElementById("tabbar");
+const wel = document.getElementById("welcome");
+const open = [];
+function show(id){
+  panes.forEach((p, k) => p.classList.toggle("on", k === id));
+  [...bar.children].forEach(t => t.classList.toggle("on", t.dataset.id === id));
+  wel.style.display = "none";
+  document.body.classList.add("reading");
+  const p = panes.get(id), f = p && p.querySelector("iframe[data-src]");
+  if (f) { f.src = f.dataset.src; f.removeAttribute("data-src"); }   // load on first open
+  if (p) {                       // land on the cited page, scroll on from there
+    const c = p.querySelector("figure.cited");
+    p.scrollTop = 0;
+    if (c) requestAnimationFrame(() => c.scrollIntoView({ block: "start" }));
+  }
+}
+function openSrc(id){
+  if (!panes.has(id)) return;
+  if (!open.includes(id)) {
+    open.push(id);
+    const p = panes.get(id);
+    const t = document.createElement("div");
+    t.className = "tab"; t.dataset.id = id;
+    t.innerHTML = '<span class="tt"></span><span class="x">✕</span>';
+    t.querySelector(".tt").textContent = p.dataset.title || "מקור";
+    t.onclick = e => { e.target.classList.contains("x") ? close(id) : show(id); };
+    bar.appendChild(t);
+    while (open.length > 8) close(open[0]);
+  }
+  show(id);
+}
+function close(id){
+  const i = open.indexOf(id); if (i < 0) return;
+  open.splice(i, 1);
+  const t = [...bar.children].find(t => t.dataset.id === id);
+  if (t) t.remove();
+  panes.get(id).classList.remove("on");
+  if (open.length) show(open[open.length - 1]);
+  else { wel.style.display = ""; document.body.classList.remove("reading"); }
+}
+document.addEventListener("click", e => {
+  const a = e.target.closest("a.cite, .s[data-id]");
+  if (!a) return;
+  const id = a.dataset.id || (a.getAttribute("href") || "").slice(1);
+  if (!panes.has(id)) return;
+  e.preventDefault();
+  openSrc(id);
+});
+document.getElementById("back").onclick = () => document.body.classList.remove("reading");
+</script>
+
+</body>
+</html>
